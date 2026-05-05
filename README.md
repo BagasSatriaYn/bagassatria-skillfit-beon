@@ -52,16 +52,21 @@ Pastikan sudah terinstall:
 
 ### 1️⃣ Clone Repository
 
-```bash
+bash
 git clone https://github.com/BagasSatriaYn/bagassatria-skillfit-beon.git
 cd bagassatria-skillfit-beon
-2️⃣ Instalasi Backend (Laravel)
+
+---
+
+### 2️⃣ Instalasi Backend (Laravel)
 cd backend
 composer install
 cp .env.example .env
 php artisan key:generate
 
-📌 Konfigurasi Database
+---
+
+### 📌 Konfigurasi Database
 
 Edit file .env
 Sesuaikan DB_DATABASE, DB_USERNAME, DB_PASSWORD
@@ -71,25 +76,37 @@ Jalankan migrasi & seeder:
 php artisan migrate --seed
 php artisan storage:link
 php artisan serve
-3️⃣ Instalasi Frontend (React)
+
+---
+
+### 3️⃣ Instalasi Frontend (React)
 
 Buka terminal baru:
 
 cd frontend
 npm install
 npm run dev
-🔐 Akun Demo
+
+---
+
+### 🔐 Akun Demo
 
 Gunakan akun berikut untuk login:
 
 Email    : admin@rt.com
 Password : password
-🧪 Pengujian Sistem
+
+---
+
+### 🧪 Pengujian Sistem
 
 Dokumentasi pengujian tersedia pada:
 
 FRONTEND_SUMMARY.md → Ringkasan teknis komponen UI
-👨‍💻 Author
+
+---
+
+### 👨‍💻 Author
 
 Bagas Satria Yudho Nugraha
 Project ini dibuat untuk kebutuhan:
