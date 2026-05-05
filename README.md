@@ -1,169 +1,109 @@
-# 🏠 RT Management System (Fullstack)
+# 🏠 WargaHub - Smart RT Management System
 
-Sistem manajemen RT berbasis web untuk mengelola data penghuni, rumah, iuran, serta pembayaran dengan fitur historis dan dashboard monitoring.
+**WargaHub** adalah sistem manajemen administrasi RT modern yang dirancang untuk mempermudah pengelolaan data warga, hunian, serta laporan keuangan iuran secara transparan dan real-time.
 
 ---
 
 ## 🚀 Tech Stack
 
-### Backend
+### 🧩 Backend
+- Laravel 11 (REST API)
+- MySQL (Database)
+- Laravel Sanctum (Authentication)
 
-* Laravel (REST API)
-* MySQL
-
-### Frontend *(in progress / optional)*
-
-* React JS
-
----
-
-## 📦 Fitur Utama
-
-### 👤 Manajemen Penghuni
-
-* CRUD data penghuni
-* Status penghuni (tetap / kontrak)
-
-### 🏠 Manajemen Rumah
-
-* CRUD data rumah
-* Status rumah (terisi / kosong)
-
-### 🔄 Assign Penghuni ke Rumah (Core Feature)
-
-* Assign penghuni ke rumah
-* Otomatis mengakhiri penghuni sebelumnya
-* Menyimpan **riwayat penghuni (historical data)**
-
-### 💰 Sistem Iuran (Dues)
-
-* Iuran satpam & kebersihan
-* Per bulan
-* Status: unpaid, partial, paid
-
-### 💳 Sistem Pembayaran
-
-* Mendukung pembayaran cicilan
-* Update status otomatis:
-
-  * unpaid → partial → paid
-
-### 📊 Dashboard
-
-* Total rumah
-* Rumah terisi & kosong
-* Total pemasukan
-* Total pengeluaran
-* Total tunggakan
+### 🎨 Frontend
+- React.js (Vite)
+- Chart.js (Data Visualization)
+- Context API (State Management)
 
 ---
 
-## 🌐 API Endpoint
+## 📦 Fitur Unggulan
 
-Base URL:
+- 📊 **Dashboard Interaktif**  
+  Monitoring kas RT, status hunian, dan grafik tren arus kas tahunan.
 
-```
-http://127.0.0.1:8000/api
-```
+- 🏘️ **Manajemen Hunian**  
+  Tracking riwayat penghuni rumah (tetap/kontrak) secara historis.
 
-### Houses
+- 💰 **Sistem Iuran Fleksibel**  
+  Pengelolaan iuran satpam & kebersihan dengan dukungan pembayaran:
+  - Unpaid
+  - Partial
+  - Paid
 
-* GET `/houses`
-* POST `/houses`
-* GET `/houses/{id}`
-* PUT `/houses/{id}`
-* DELETE `/houses/{id}`
+- 📑 **Laporan Keuangan**  
+  Rekap pemasukan dan pengeluaran dengan filter per tahun.
 
-### Residents
-
-* GET `/residents`
-* POST `/residents`
-* GET `/residents/{id}`
-* PUT `/residents/{id}`
-* DELETE `/residents/{id}`
-
-### Assignment
-
-* POST `/assign-house`
-
-### Dues
-
-* GET `/dues`
-* POST `/dues`
-
-### Payment
-
-* POST `/pay`
-
-### Dashboard
-
-* GET `/dashboard`
+- 🎯 **Branding Modern**  
+  UI/UX bersih dengan tema warna **Emerald & Orange** yang profesional.
 
 ---
 
-## ⚙️ Installation (Backend)
+## ⚙️ Panduan Instalasi (WAJIB DIIKUTI)
 
-```bash
-git clone <repo-url>
-cd backend
+Pastikan sudah terinstall:
+- PHP >= 8.2
+- Composer
+- Node.js
+- MySQL
 
-composer install
-cp .env.example .env
-php artisan key:generate
 
-# setup database di .env
-php artisan migrate
+### 1️⃣ Clone Repository
 
-php artisan serve
-```
+bash
+git clone https://github.com/BagasSatriaYn/bagassatria-skillfit-beon.git <br>
+cd bagassatria-skillfit-beon
 
----
 
-## 🧪 Testing API
 
-Gunakan Postman / tools lain dengan header:
+### 2️⃣ Instalasi Backend (Laravel)
+cd backend <br>
+composer install <br>
+cp .env.example .env <br>
+php artisan key:generate <br>
 
-```
-Accept: application/json
-Content-Type: application/json
-```
 
----
+### 📌 Konfigurasi Database
 
-## 🧠 System Flow
+Edit file .env <br>
+Sesuaikan DB_DATABASE, DB_USERNAME, DB_PASSWORD
 
-```
-Residents + Houses
-        ↓
-   Assign House
-        ↓
-  House Histories
-        ↓
-     Create Due
-        ↓
-     Payment
-        ↓
-     Dashboard
-```
+Jalankan migrasi & seeder:
 
----
+php artisan migrate --seed <br>
+php artisan storage:link <br>
+php artisan serve <br>
 
-## ✨ Highlight
 
-* Relasi database kompleks (ERD-based)
-* Business logic nyata (bukan sekadar CRUD)
-* Mendukung pembayaran cicilan
-* Historical tracking penghuni
-* Siap dikembangkan ke frontend
+### 3️⃣ Instalasi Frontend (React)
 
----
+Buka terminal baru:
 
-## 👨‍💻 Author
+cd frontend <br>
+npm install <br>
+npm run dev <br>
+
+
+### 🔐 Akun Demo
+
+Gunakan akun berikut untuk login:
+
+Email    : admin@rt.com <br>
+Password : password
+
+
+### 🧪 Pengujian Sistem
+
+Dokumentasi pengujian tersedia pada:
+
+FRONTEND_SUMMARY.md → Ringkasan teknis komponen UI
+
+
+### 👨‍💻 Author
 
 Bagas Satria Yudho Nugraha
+Project ini dibuat untuk kebutuhan:
 
----
-
-## 📌 Notes
-
-Project ini dibuat sebagai bagian dari **Skill Fit Test Fullstack Programmer Apprentice**.
+🎯 Skill Fit Test Fullstack Programmer Apprentice
+PT Beon Intermedia
