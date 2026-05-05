@@ -1,75 +1,98 @@
-🏠 WargaHub - Smart RT Management System
-WargaHub adalah sistem manajemen administrasi RT modern yang dirancang untuk mempermudah pengelolaan data warga, hunian, serta laporan keuangan iuran secara transparan dan real-time.
+# 🏠 WargaHub - Smart RT Management System
 
-🚀 Tech Stack
-Backend
-Laravel 11 (REST API)
+**WargaHub** adalah sistem manajemen administrasi RT modern yang dirancang untuk mempermudah pengelolaan data warga, hunian, serta laporan keuangan iuran secara transparan dan real-time.
 
-MySQL (Database)
+---
 
-Sanctum (Authentication)
+## 🚀 Tech Stack
 
-Frontend
-React.js (Vite)
+### 🧩 Backend
+- Laravel 11 (REST API)
+- MySQL (Database)
+- Laravel Sanctum (Authentication)
 
-Chart.js (Data Visualization)
+### 🎨 Frontend
+- React.js (Vite)
+- Chart.js (Data Visualization)
+- Context API (State Management)
 
-Context API (State Management)
+---
 
-📦 Fitur Unggulan
-Dashboard Interaktif: Monitoring kas RT, status hunian, dan grafik tren arus kas tahunan.
+## 📦 Fitur Unggulan
 
-Manajemen Hunian: Tracking riwayat penghuni rumah (tetap/kontrak) secara historis.
+- 📊 **Dashboard Interaktif**  
+  Monitoring kas RT, status hunian, dan grafik tren arus kas tahunan.
 
-Sistem Iuran Fleksibel: Pengelolaan iuran satpam & kebersihan dengan dukungan pembayaran cicilan (unpaid, partial, paid).
+- 🏘️ **Manajemen Hunian**  
+  Tracking riwayat penghuni rumah (tetap/kontrak) secara historis.
 
-Laporan Keuangan: Rekapitulasi pemasukan dan pengeluaran yang dapat difilter per tahun.
+- 💰 **Sistem Iuran Fleksibel**  
+  Pengelolaan iuran satpam & kebersihan dengan dukungan pembayaran:
+  - Unpaid
+  - Partial
+  - Paid
 
-Branding Modern: UI/UX bersih dengan tema warna Emerald & Orange yang profesional.
+- 📑 **Laporan Keuangan**  
+  Rekap pemasukan dan pengeluaran dengan filter per tahun.
 
-⚙️ Panduan Instalasi (WAJIB DIIKUTI)
-Pastikan Anda memiliki PHP >= 8.2, Composer, Node.js, dan MySQL terinstal.
+- 🎯 **Branding Modern**  
+  UI/UX bersih dengan tema warna **Emerald & Orange** yang profesional.
 
-1. Persiapan Repository
-Bash
+---
+
+## ⚙️ Panduan Instalasi (WAJIB DIIKUTI)
+
+Pastikan sudah terinstall:
+- PHP >= 8.2
+- Composer
+- Node.js
+- MySQL
+
+---
+
+### 1️⃣ Clone Repository
+
+```bash
 git clone https://github.com/BagasSatriaYn/bagassatria-skillfit-beon.git
 cd bagassatria-skillfit-beon
-
-2. Instalasi Backend (Laravel)
-Bash
+2️⃣ Instalasi Backend (Laravel)
 cd backend
 composer install
 cp .env.example .env
 php artisan key:generate
-Catatan: Atur konfigurasi database Anda di file .env.
 
-Jalankan migrasi, seeder, dan link storage:
+📌 Konfigurasi Database
 
-Bash
+Edit file .env
+Sesuaikan DB_DATABASE, DB_USERNAME, DB_PASSWORD
+
+Jalankan migrasi & seeder:
+
 php artisan migrate --seed
 php artisan storage:link
 php artisan serve
+3️⃣ Instalasi Frontend (React)
 
-3. Instalasi Frontend (React)
 Buka terminal baru:
 
-Bash
 cd frontend
 npm install
 npm run dev
+🔐 Akun Demo
 
-🔐 Akun Akses Demo
-Gunakan kredensial berikut untuk menguji sistem:
+Gunakan akun berikut untuk login:
 
-Email: admin@rt.com
-
-Password: password
-
+Email    : admin@rt.com
+Password : password
 🧪 Pengujian Sistem
-Laporan pengujian detail dapat dilihat pada file berikut:
 
-FRONTEND_SUMMARY.md: Ringkasan teknis komponen UI.
+Dokumentasi pengujian tersedia pada:
 
+FRONTEND_SUMMARY.md → Ringkasan teknis komponen UI
 👨‍💻 Author
+
 Bagas Satria Yudho Nugraha
-Project ini dibuat untuk Skill Fit Test Fullstack Programmer Apprentice PT Beon Intermedia.
+Project ini dibuat untuk kebutuhan:
+
+🎯 Skill Fit Test Fullstack Programmer Apprentice
+PT Beon Intermedia
