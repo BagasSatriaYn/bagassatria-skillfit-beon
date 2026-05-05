@@ -6,9 +6,29 @@ const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     'Accept': 'application/json',
-    'Content-Type': 'application/json',
   },
 });
+
+// Request Interceptor: Menambahkan token ke header
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+// Response Interceptor: Menangani eror 401
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      localStorage.removeItem('token');
+      // Opsional: window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
 
 // Residents endpoints
 export const residentsAPI = {
@@ -41,15 +61,15 @@ export const housesAPI = {
   getHistory: (id) => api.get(`/houses/${id}/history`),
 };
 
-// Payments endpoints
+// Payments endpoints (mapped to dues in backend)
 export const paymentsAPI = {
-  getAll: () => api.get('/payments'),
-  get: (id) => api.get(`/payments/${id}`),
-  create: (data) => api.post('/payments', data),
-  update: (id, data) => api.put(`/payments/${id}`, data),
-  delete: (id) => api.delete(`/payments/${id}`),
-  getByMonth: (year, month) => api.get(`/payments/month/${year}/${month}`),
-  getByYear: (year) => api.get(`/payments/year/${year}`),
+  getAll: () => api.get('/dues'),
+  get: (id) => api.get(`/dues/${id}`),
+  create: (data) => api.post('/dues', data),
+  update: (id, data) => api.put(`/dues/${id}`, data),
+  delete: (id) => api.delete(`/dues/${id}`),
+  getByMonth: (year, month) => api.get(`/dues/month/${year}/${month}`),
+  getByYear: (year) => api.get(`/dues/year/${year}`),
 };
 
 // Reports endpoints
@@ -63,6 +83,13 @@ export const reportsAPI = {
 // Dashboard endpoints
 export const dashboardAPI = {
   getSummary: () => api.get('/dashboard'),
+};
+
+// Expenses endpoints
+export const expensesAPI = {
+  getAll: () => api.get('/expenses'),
+  create: (data) => api.post('/expenses', data),
+  delete: (id) => api.delete(`/expenses/${id}`),
 };
 
 export default api;
