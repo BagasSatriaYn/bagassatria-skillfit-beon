@@ -1,169 +1,75 @@
-# 🏠 RT Management System (Fullstack)
+🏠 WargaHub - Smart RT Management System
+WargaHub adalah sistem manajemen administrasi RT modern yang dirancang untuk mempermudah pengelolaan data warga, hunian, serta laporan keuangan iuran secara transparan dan real-time.
 
-Sistem manajemen RT berbasis web untuk mengelola data penghuni, rumah, iuran, serta pembayaran dengan fitur historis dan dashboard monitoring.
+🚀 Tech Stack
+Backend
+Laravel 11 (REST API)
 
----
+MySQL (Database)
 
-## 🚀 Tech Stack
+Sanctum (Authentication)
 
-### Backend
+Frontend
+React.js (Vite)
 
-* Laravel (REST API)
-* MySQL
+Chart.js (Data Visualization)
 
-### Frontend *(in progress / optional)*
+Context API (State Management)
 
-* React JS
+📦 Fitur Unggulan
+Dashboard Interaktif: Monitoring kas RT, status hunian, dan grafik tren arus kas tahunan.
 
----
+Manajemen Hunian: Tracking riwayat penghuni rumah (tetap/kontrak) secara historis.
 
-## 📦 Fitur Utama
+Sistem Iuran Fleksibel: Pengelolaan iuran satpam & kebersihan dengan dukungan pembayaran cicilan (unpaid, partial, paid).
 
-### 👤 Manajemen Penghuni
+Laporan Keuangan: Rekapitulasi pemasukan dan pengeluaran yang dapat difilter per tahun.
 
-* CRUD data penghuni
-* Status penghuni (tetap / kontrak)
+Branding Modern: UI/UX bersih dengan tema warna Emerald & Orange yang profesional.
 
-### 🏠 Manajemen Rumah
+⚙️ Panduan Instalasi (WAJIB DIIKUTI)
+Pastikan Anda memiliki PHP >= 8.2, Composer, Node.js, dan MySQL terinstal.
 
-* CRUD data rumah
-* Status rumah (terisi / kosong)
+1. Persiapan Repository
+Bash
+git clone https://github.com/BagasSatriaYn/bagassatria-skillfit-beon.git
+cd bagassatria-skillfit-beon
 
-### 🔄 Assign Penghuni ke Rumah (Core Feature)
-
-* Assign penghuni ke rumah
-* Otomatis mengakhiri penghuni sebelumnya
-* Menyimpan **riwayat penghuni (historical data)**
-
-### 💰 Sistem Iuran (Dues)
-
-* Iuran satpam & kebersihan
-* Per bulan
-* Status: unpaid, partial, paid
-
-### 💳 Sistem Pembayaran
-
-* Mendukung pembayaran cicilan
-* Update status otomatis:
-
-  * unpaid → partial → paid
-
-### 📊 Dashboard
-
-* Total rumah
-* Rumah terisi & kosong
-* Total pemasukan
-* Total pengeluaran
-* Total tunggakan
-
----
-
-## 🌐 API Endpoint
-
-Base URL:
-
-```
-http://127.0.0.1:8000/api
-```
-
-### Houses
-
-* GET `/houses`
-* POST `/houses`
-* GET `/houses/{id}`
-* PUT `/houses/{id}`
-* DELETE `/houses/{id}`
-
-### Residents
-
-* GET `/residents`
-* POST `/residents`
-* GET `/residents/{id}`
-* PUT `/residents/{id}`
-* DELETE `/residents/{id}`
-
-### Assignment
-
-* POST `/assign-house`
-
-### Dues
-
-* GET `/dues`
-* POST `/dues`
-
-### Payment
-
-* POST `/pay`
-
-### Dashboard
-
-* GET `/dashboard`
-
----
-
-## ⚙️ Installation (Backend)
-
-```bash
-git clone <repo-url>
+2. Instalasi Backend (Laravel)
+Bash
 cd backend
-
 composer install
 cp .env.example .env
 php artisan key:generate
+Catatan: Atur konfigurasi database Anda di file .env.
 
-# setup database di .env
-php artisan migrate
+Jalankan migrasi, seeder, dan link storage:
 
+Bash
+php artisan migrate --seed
+php artisan storage:link
 php artisan serve
-```
 
----
+3. Instalasi Frontend (React)
+Buka terminal baru:
 
-## 🧪 Testing API
+Bash
+cd frontend
+npm install
+npm run dev
 
-Gunakan Postman / tools lain dengan header:
+🔐 Akun Akses Demo
+Gunakan kredensial berikut untuk menguji sistem:
 
-```
-Accept: application/json
-Content-Type: application/json
-```
+Email: admin@rt.com
 
----
+Password: password
 
-## 🧠 System Flow
+🧪 Pengujian Sistem
+Laporan pengujian detail dapat dilihat pada file berikut:
 
-```
-Residents + Houses
-        ↓
-   Assign House
-        ↓
-  House Histories
-        ↓
-     Create Due
-        ↓
-     Payment
-        ↓
-     Dashboard
-```
+FRONTEND_SUMMARY.md: Ringkasan teknis komponen UI.
 
----
-
-## ✨ Highlight
-
-* Relasi database kompleks (ERD-based)
-* Business logic nyata (bukan sekadar CRUD)
-* Mendukung pembayaran cicilan
-* Historical tracking penghuni
-* Siap dikembangkan ke frontend
-
----
-
-## 👨‍💻 Author
-
+👨‍💻 Author
 Bagas Satria Yudho Nugraha
-
----
-
-## 📌 Notes
-
-Project ini dibuat sebagai bagian dari **Skill Fit Test Fullstack Programmer Apprentice**.
+Project ini dibuat untuk Skill Fit Test Fullstack Programmer Apprentice PT Beon Intermedia.
