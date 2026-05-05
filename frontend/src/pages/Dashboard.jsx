@@ -153,13 +153,27 @@ export default function Dashboard() {
     <div style={{ backgroundColor: 'var(--color-bg-body)', minHeight: '100vh', padding: '32px', fontFamily: 'sans-serif' }}>
 
       {/* Header Mirip Konsep Gambar */}
-      <div style={{ marginBottom: '24px' }}>
-        <h2 style={{ color: 'var(--color-text-main)', fontSize: '24px', fontWeight: 'bold', margin: 0 }}>Laporan Smart RT</h2>
+      <div style={{ marginBottom: '32px' }}>
+        <h2 style={{ color: '#111827', fontSize: '26px', fontWeight: '800', margin: 0 }}>
+          Ringkasan Smart RT
+        </h2>
+        <div style={{ display: 'flex', alignItems: 'center', marginTop: '6px', gap: '8px' }}>
+          <span style={{
+            height: '8px',
+            width: '8px',
+            backgroundColor: '#10B981',
+            borderRadius: '50%',
+            display: 'inline-block'
+          }}></span>
+          <p style={{ color: '#6B7280', fontSize: '14px', fontWeight: '500', margin: 0 }}>
+            Status sistem aktif untuk periode tahun 2026
+          </p>
+        </div>
       </div>
 
       {/* Grid Keuangan */}
       <div style={{ marginBottom: '16px' }}>
-        <h3 style={{ color: 'var(--color-text-muted)', fontSize: '16px', fontWeight: 'normal', margin: 0 }}>Ringkasan Keuangan</h3>
+        <h3 style={{ color: 'var(--color-text-main)', fontSize: '18px', fontWeight: 'bold', margin: 0 }}>Ringkasan Keuangan</h3>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px', marginBottom: '32px' }}>
         <div className="stat-card">
