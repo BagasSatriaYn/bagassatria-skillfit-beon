@@ -41,53 +41,38 @@ class ResidentController extends Controller
         return response()->json(['data' => $resident]);
     }
 
-   public function update(Request $request, $id)
-{
-    $resident = Resident::findOrFail($id);
-
-    // Tambahkan log untuk debugging jika masih gagal
-    // \Log::info($request->all());
-
-    $data = $request->validate([
-        'full_name' => 'sometimes|required|string',
-        'status' => 'sometimes|required|in:permanent,contract',
-        'phone_number' => 'sometimes|required|string',
-        'is_married' => 'sometimes',
-        'ktp_photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
-    ]);
-
-    if ($request->hasFile('ktp_photo')) {
-        // Hapus foto lama jika ada di storage
-        if ($resident->ktp_photo) {
-            Storage::disk('public')->delete($resident->ktp_photo);
-        }
-        
-        $path = $request->file('ktp_photo')->store('residents', 'public');
-        $data['ktp_photo'] = $path;
-    }
-
     public function update(Request $request, $id)
-{
-    $resident = Resident::findOrFail($id);
+    {
+        $resident = Resident::findOrFail($id);
 
-    $validated = $request->validate([
-        'full_name' => 'sometimes|required|string|max:255',
-        'status' => 'sometimes|required|in:permanent,contract',
-        'phone_number' => 'sometimes|required|string',
-        'is_married' => 'sometimes', // Jangan paksa boolean keras di sini karena dari FormData datang sebagai string '1'/'0'
-        'ktp_photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
-    ]);
+        $validated = $request->validate([
+            'full_name' => 'sometimes|required|string|max:255',
+            'status' => 'sometimes|required|in:permanent,contract',
+            'phone_number' => 'sometimes|required|string',
+            'is_married' => 'sometimes', // Jangan paksa boolean keras di sini karena dari FormData datang sebagai string '1'/'0'
+            'ktp_photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
+        ]);
 
-    if ($request->hasFile('ktp_photo')) {
-        // Hapus file lama
+        if ($request->hasFile('ktp_photo')) {
+            // Hapus file lama
+            if ($resident->ktp_photo) {
+                Storage::disk('public')->delete($resident->ktp_photo);
+            }
+            $path = $request->file('ktp_photo')->store('residents', 'public');
+            $validated['ktp_photo'] = $path;
+        }
+
+        $resident->update($validated);
+        return response()->json(['data' => $resident]);
+    }
+
+    public function destroy($id)
+    {
+        $resident = Resident::findOrFail($id);
         if ($resident->ktp_photo) {
             Storage::disk('public')->delete($resident->ktp_photo);
         }
-        $path = $request->file('ktp_photo')->store('residents', 'public');
-        $validated['ktp_photo'] = $path;
+        $resident->delete();
+        return response()->json(['message' => 'Resident deleted successfully']);
     }
-
-    $resident->update($validated);
-    return response()->json(['data' => $resident]);
-}
 }
