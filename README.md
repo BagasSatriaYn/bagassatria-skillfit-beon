@@ -48,7 +48,6 @@ Pastikan sudah terinstall:
 - Node.js
 - MySQL
 
----
 
 ### 1️⃣ Clone Repository
 
@@ -56,7 +55,7 @@ bash
 git clone https://github.com/BagasSatriaYn/bagassatria-skillfit-beon.git
 cd bagassatria-skillfit-beon
 
----
+
 
 ### 2️⃣ Instalasi Backend (Laravel)
 cd backend
@@ -64,7 +63,6 @@ composer install
 cp .env.example .env
 php artisan key:generate
 
----
 
 ### 📌 Konfigurasi Database
 
@@ -77,7 +75,6 @@ php artisan migrate --seed
 php artisan storage:link
 php artisan serve
 
----
 
 ### 3️⃣ Instalasi Frontend (React)
 
@@ -87,7 +84,6 @@ cd frontend
 npm install
 npm run dev
 
----
 
 ### 🔐 Akun Demo
 
@@ -96,7 +92,6 @@ Gunakan akun berikut untuk login:
 Email    : admin@rt.com
 Password : password
 
----
 
 ### 🧪 Pengujian Sistem
 
@@ -104,7 +99,6 @@ Dokumentasi pengujian tersedia pada:
 
 FRONTEND_SUMMARY.md → Ringkasan teknis komponen UI
 
----
 
 ### 👨‍💻 Author
 
