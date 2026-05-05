@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { reportsAPI } from '../services/api';
 
 export default function ExpenseReport({ year }) {
+  const navigate = useNavigate();
   const [expenses, setExpenses] = useState([]);
   const [selectedMonth, setSelectedMonth] = useState(new Date().toISOString().slice(0, 7));
   const [loading, setLoading] = useState(true);
@@ -19,18 +21,14 @@ export default function ExpenseReport({ year }) {
       setExpenses(res.data.data?.expenses || []);
       setError(null);
     } catch (err) {
-      // Use dummy data if API fails
-      setExpenses([
-        { id: 1, nama: 'Perbaikan Jalan', jumlah: 500000, tanggal: '2024-01-05', keterangan: 'Perbaikan aspal' },
-        { id: 2, nama: 'Gaji Satpam', jumlah: 1000000, tanggal: '2024-01-10', keterangan: 'Gaji bulan Januari' },
-        { id: 3, nama: 'Token Listrik Pos Satpam', jumlah: 200000, tanggal: '2024-01-15', keterangan: 'Listrik' },
-      ]);
+      setError('Gagal memuat data pengeluaran dari server.');
+      setExpenses([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const totalExpense = expenses.reduce((sum, exp) => sum + (exp.jumlah || 0), 0);
+  const totalExpense = expenses.reduce((sum, exp) => sum + (exp.amount || 0), 0);
 
   if (loading) {
     return <div className="loading">⏳ Memuat data pengeluaran...</div>;
@@ -40,6 +38,12 @@ export default function ExpenseReport({ year }) {
     <div className="card">
       <div className="card-header">
         <h2>💸 Detail Pengeluaran</h2>
+        <button 
+          className="btn btn-primary"
+          onClick={() => navigate('/expenses/new')}
+        >
+          + Tambah Pengeluaran
+        </button>
       </div>
 
       {error && <div className="error">⚠️ {error}</div>}
@@ -62,30 +66,36 @@ export default function ExpenseReport({ year }) {
       </div>
 
       {expenses.length === 0 ? (
-        <p style={{ textAlign: 'center', padding: '2rem', color: '#666' }}>
+        <p style={{ textAlign: 'center', padding: '2rem', color: 'var(--color-text-muted)' }}>
           Tidak ada data pengeluaran untuk bulan ini.
         </p>
       ) : (
-        <table className="table">
-          <thead>
-            <tr>
-              <th>Tanggal</th>
-              <th>Nama Pengeluaran</th>
-              <th>Jumlah</th>
-              <th>Keterangan</th>
-            </tr>
-          </thead>
-          <tbody>
-            {expenses.map((expense) => (
-              <tr key={expense.id}>
-                <td>{new Date(expense.tanggal).toLocaleDateString('id-ID')}</td>
-                <td>{expense.nama}</td>
-                <td>Rp {expense.jumlah?.toLocaleString('id-ID')}</td>
-                <td>{expense.keterangan || '-'}</td>
+        <div className="table-responsive">
+          <table className="table">
+            <thead>
+              <tr>
+                <th>Tanggal</th>
+                <th>Kategori</th>
+                <th>Nama Pengeluaran</th>
+                <th>Jumlah</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {expenses.map((expense) => (
+                <tr key={expense.id}>
+                  <td>{new Date(expense.expense_date).toLocaleDateString('id-ID')}</td>
+                  <td>
+                    <span className={`badge ${expense.expense_category === 'Rutin' ? 'badge-info' : 'badge-warning'}`}>
+                      {expense.expense_category}
+                    </span>
+                  </td>
+                  <td>{expense.description || '-'}</td>
+                  <td>Rp {expense.amount?.toLocaleString('id-ID')}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );

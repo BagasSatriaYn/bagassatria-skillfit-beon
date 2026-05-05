@@ -13,11 +13,23 @@ export default function PaymentForm({ onSave, error: propError, payments = [] })
   const [loading, setLoading] = useState(!!id);
   const [error, setError] = useState(propError);
   const [residents, setResidents] = useState([]);
-  const [formData, setFormData] = useState({
+  
+  // Create mode state
+  const [bulkData, setBulkData] = useState({
+    resident_id: '',
+    start_month: new Date().toISOString().slice(0, 7),
+    kebersihan_months: 1,
+    satpam_months: 1,
+    status: 'lunas',
+    tanggal_bayar: new Date().toISOString().slice(0, 10),
+  });
+
+  // Edit mode state
+  const [editData, setEditData] = useState({
     resident_id: '',
     jenis_iuran: 'satpam',
-    bulan: new Date().toISOString().slice(0, 7),
-    jumlah: CHARGES.satpam,
+    bulan: '',
+    jumlah: 0,
     status: 'belum',
     tanggal_bayar: '',
   });
@@ -44,28 +56,19 @@ export default function PaymentForm({ onSave, error: propError, payments = [] })
 
   const loadPayment = async () => {
     try {
-      const payment = payments.find(p => p.id == id);
-      if (payment) {
-        setFormData({
-          resident_id: payment.resident_id,
-          jenis_iuran: payment.jenis_iuran,
-          bulan: payment.bulan,
-          jumlah: payment.jumlah,
-          status: payment.status,
-          tanggal_bayar: payment.tanggal_bayar || '',
-        });
-      } else {
+      let p = payments.find(pay => pay.id == id);
+      if (!p) {
         const res = await paymentsAPI.get(id);
-        const payment = res.data.data;
-        setFormData({
-          resident_id: payment.resident_id,
-          jenis_iuran: payment.jenis_iuran,
-          bulan: payment.bulan,
-          jumlah: payment.jumlah,
-          status: payment.status,
-          tanggal_bayar: payment.tanggal_bayar || '',
-        });
+        p = res.data.data;
       }
+      setEditData({
+        resident_id: p.resident_id,
+        jenis_iuran: p.due_type === 'security' ? 'satpam' : 'kebersihan',
+        bulan: p.due_month?.substring(0, 7) || new Date().toISOString().slice(0, 7),
+        jumlah: p.amount,
+        status: p.status === 'paid' ? 'lunas' : 'belum',
+        tanggal_bayar: p.payments?.length > 0 ? p.payments[0].payment_date.substring(0, 10) : '',
+      });
       setLoading(false);
     } catch (err) {
       setError('Gagal memuat data pembayaran: ' + (err.response?.data?.message || err.message));
@@ -73,136 +76,172 @@ export default function PaymentForm({ onSave, error: propError, payments = [] })
     }
   };
 
-  const handleChange = (e) => {
+  const handleBulkChange = (e) => {
     const { name, value } = e.target;
-    
-    let newData = { ...formData, [name]: value };
-    
-    // Update jumlah based on jenis_iuran
+    setBulkData({ ...bulkData, [name]: value });
+  };
+
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
+    let newData = { ...editData, [name]: value };
     if (name === 'jenis_iuran') {
       newData.jumlah = CHARGES[value] || 0;
     }
-    
-    setFormData(newData);
+    setEditData(newData);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!formData.resident_id) {
-      setError('Pilih penghuni terlebih dahulu');
-      return;
+    if (id) {
+      if (!editData.resident_id) {
+        setError('Pilih penghuni terlebih dahulu');
+        return;
+      }
+      await onSave(editData, id);
+    } else {
+      if (!bulkData.resident_id) {
+        setError('Pilih penghuni terlebih dahulu');
+        return;
+      }
+      await onSave(bulkData, null);
     }
-
-    await onSave(formData, id);
   };
 
   if (loading) {
     return <div className="loading">⏳ Memuat data...</div>;
   }
 
+  const totalKebersihan = bulkData.kebersihan_months * CHARGES.kebersihan;
+  const totalSatpam = bulkData.satpam_months * CHARGES.satpam;
+  const grandTotal = totalKebersihan + totalSatpam;
+
   return (
     <div className="card">
       <div className="card-header">
-        <h2>{id ? '✏️ Edit Pembayaran' : '➕ Tambah Pembayaran'}</h2>
+        <h2>{id ? '✏️ Edit Pembayaran' : '➕ Tambah Pembayaran Sekaligus'}</h2>
       </div>
 
       {error && <div className="error">⚠️ {error}</div>}
 
       <form onSubmit={handleSubmit}>
-        <div className="form-row">
-          <div className="form-group">
-            <label>Penghuni *</label>
-            <select
-              name="resident_id"
-              value={formData.resident_id}
-              onChange={handleChange}
-              required
-            >
-              <option value="">-- Pilih Penghuni --</option>
-              {residents.map(resident => (
-                <option key={resident.id} value={resident.id}>
-                  {resident.nama_lengkap}
-                </option>
-              ))}
-            </select>
-          </div>
+        {!id ? (
+          /* CREATE MODE (BULK) */
+          <>
+            <div className="form-row">
+              <div className="form-group">
+                <label>Penghuni *</label>
+                <select name="resident_id" value={bulkData.resident_id} onChange={handleBulkChange} required>
+                  <option value="">-- Pilih Penghuni --</option>
+                  {residents.map(r => <option key={r.id} value={r.id}>{r.full_name}</option>)}
+                </select>
+              </div>
 
-          <div className="form-group">
-            <label>Jenis Iuran *</label>
-            <select
-              name="jenis_iuran"
-              value={formData.jenis_iuran}
-              onChange={handleChange}
-              required
-            >
-              <option value="satpam">Satpam (Rp 100.000)</option>
-              <option value="kebersihan">Kebersihan (Rp 15.000)</option>
-            </select>
-          </div>
-        </div>
+              <div className="form-group">
+                <label>Mulai Bulan (Periode) *</label>
+                <input type="month" name="start_month" value={bulkData.start_month} onChange={handleBulkChange} required />
+              </div>
+            </div>
 
-        <div className="form-row">
-          <div className="form-group">
-            <label>Bulan *</label>
-            <input
-              type="month"
-              name="bulan"
-              value={formData.bulan}
-              onChange={handleChange}
-              required
-            />
-          </div>
+            <div className="form-row">
+              <div className="form-group" style={{ backgroundColor: 'var(--color-bg-body)', padding: '1rem', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
+                <label style={{ color: '#0F172A', fontWeight: 'bold' }}>Iuran Kebersihan (Rp 15.000/bln)</label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
+                  <input type="number" name="kebersihan_months" value={bulkData.kebersihan_months} onChange={handleBulkChange} min="0" required style={{ width: '100px' }} />
+                  <span>Bulan</span>
+                </div>
+                <div style={{ marginTop: '0.5rem', fontSize: '0.9rem', color: '#64748B' }}>
+                  Subtotal: Rp {totalKebersihan.toLocaleString('id-ID')}
+                </div>
+              </div>
 
-          <div className="form-group">
-            <label>Jumlah *</label>
-            <input
-              type="number"
-              name="jumlah"
-              value={formData.jumlah}
-              onChange={handleChange}
-              required
-              min="0"
-            />
-          </div>
-        </div>
+              <div className="form-group" style={{ backgroundColor: 'var(--color-bg-body)', padding: '1rem', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
+                <label style={{ color: '#0F172A', fontWeight: 'bold' }}>Iuran Satpam (Rp 100.000/bln)</label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
+                  <input type="number" name="satpam_months" value={bulkData.satpam_months} onChange={handleBulkChange} min="0" required style={{ width: '100px' }} />
+                  <span>Bulan</span>
+                </div>
+                <div style={{ marginTop: '0.5rem', fontSize: '0.9rem', color: '#64748B' }}>
+                  Subtotal: Rp {totalSatpam.toLocaleString('id-ID')}
+                </div>
+              </div>
+            </div>
 
-        <div className="form-row">
-          <div className="form-group">
-            <label>Status *</label>
-            <select
-              name="status"
-              value={formData.status}
-              onChange={handleChange}
-              required
-            >
-              <option value="belum">Belum Lunas</option>
-              <option value="lunas">Lunas</option>
-            </select>
-          </div>
+            <div className="form-row">
+              <div className="form-group">
+                <label>Status *</label>
+                <select name="status" value={bulkData.status} onChange={handleBulkChange} required>
+                  <option value="belum">Belum Lunas</option>
+                  <option value="lunas">Lunas</option>
+                </select>
+              </div>
 
-          <div className="form-group">
-            <label>Tanggal Bayar (jika sudah lunas)</label>
-            <input
-              type="date"
-              name="tanggal_bayar"
-              value={formData.tanggal_bayar}
-              onChange={handleChange}
-            />
-          </div>
-        </div>
+              <div className="form-group">
+                <label>Tanggal Bayar (jika Lunas)</label>
+                <input type="date" name="tanggal_bayar" value={bulkData.tanggal_bayar} onChange={handleBulkChange} disabled={bulkData.status !== 'lunas'} />
+              </div>
+            </div>
+
+            <div style={{ backgroundColor: 'var(--color-bg-body)', padding: '1rem', borderRadius: '8px', marginBottom: '1.5rem', border: '1px dashed #BFDBFE' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <strong style={{ color: '#1E3A8A', fontSize: '1.1rem' }}>Total Tagihan:</strong>
+                <strong style={{ color: '#1D4ED8', fontSize: '1.3rem' }}>Rp {grandTotal.toLocaleString('id-ID')}</strong>
+              </div>
+            </div>
+          </>
+        ) : (
+          /* EDIT MODE (SINGLE) */
+          <>
+            <div className="form-row">
+              <div className="form-group">
+                <label>Penghuni *</label>
+                <select name="resident_id" value={editData.resident_id} onChange={handleEditChange} required>
+                  <option value="">-- Pilih Penghuni --</option>
+                  {residents.map(r => <option key={r.id} value={r.id}>{r.full_name}</option>)}
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label>Jenis Iuran *</label>
+                <select name="jenis_iuran" value={editData.jenis_iuran} onChange={handleEditChange} required>
+                  <option value="satpam">Satpam</option>
+                  <option value="kebersihan">Kebersihan</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="form-row">
+              <div className="form-group">
+                <label>Bulan *</label>
+                <input type="month" name="bulan" value={editData.bulan} onChange={handleEditChange} required />
+              </div>
+
+              <div className="form-group">
+                <label>Jumlah *</label>
+                <input type="number" name="jumlah" value={editData.jumlah} onChange={handleEditChange} required min="0" />
+              </div>
+            </div>
+
+            <div className="form-row">
+              <div className="form-group">
+                <label>Status *</label>
+                <select name="status" value={editData.status} onChange={handleEditChange} required>
+                  <option value="belum">Belum Lunas</option>
+                  <option value="lunas">Lunas</option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label>Tanggal Bayar (jika Lunas)</label>
+                <input type="date" name="tanggal_bayar" value={editData.tanggal_bayar} onChange={handleEditChange} disabled={editData.status !== 'lunas'} />
+              </div>
+            </div>
+          </>
+        )}
 
         <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
-          <button
-            type="button"
-            className="btn btn-secondary"
-            onClick={() => navigate('/payments')}
-          >
-            Batal
-          </button>
-          <button type="submit" className="btn btn-primary">
-            {id ? 'Simpan Perubahan' : 'Tambah Pembayaran'}
-          </button>
+          <button type="button" className="btn btn-secondary" onClick={() => navigate('/payments')}>Batal</button>
+          <button type="submit" className="btn btn-primary">{id ? 'Simpan Perubahan' : 'Simpan Pembayaran'}</button>
         </div>
       </form>
     </div>
