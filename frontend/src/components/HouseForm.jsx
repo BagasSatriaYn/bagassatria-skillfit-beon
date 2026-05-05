@@ -8,10 +8,10 @@ export default function HouseForm({ onSave, error: propError, houses = [] }) {
   const [loading, setLoading] = useState(!!id);
   const [error, setError] = useState(propError);
   const [residents, setResidents] = useState([]);
+  
   const [formData, setFormData] = useState({
-    nomor_rumah: '',
-    status: 'kosong',
-    alamat: '',
+    house_number: '',
+    status: 'empty',
     resident_id: '',
   });
 
@@ -29,7 +29,7 @@ export default function HouseForm({ onSave, error: propError, houses = [] }) {
   const loadResidents = async () => {
     try {
       const res = await residentsAPI.getAll();
-      setResidents(res.data.data || []);
+      setResidents(res.data.data || res.data || []);
     } catch (err) {
       console.error('Gagal memuat penghuni:', err);
     }
@@ -40,18 +40,17 @@ export default function HouseForm({ onSave, error: propError, houses = [] }) {
       const house = houses.find(h => h.id == id);
       if (house) {
         setFormData({
-          nomor_rumah: house.nomor_rumah,
+          house_number: house.house_number,
           status: house.status,
-          alamat: house.alamat,
-          resident_id: house.residents?.[0]?.id || '',
+          resident_id: house.current_resident?.resident_id || '',
         });
       } else {
         const res = await housesAPI.get(id);
+        const houseData = res.data.data || res.data;
         setFormData({
-          nomor_rumah: res.data.data.nomor_rumah,
-          status: res.data.data.status,
-          alamat: res.data.data.alamat,
-          resident_id: res.data.data.residents?.[0]?.id || '',
+          house_number: houseData.house_number,
+          status: houseData.status,
+          resident_id: houseData.current_resident?.resident_id || '',
         });
       }
       setLoading(false);
@@ -66,14 +65,21 @@ export default function HouseForm({ onSave, error: propError, houses = [] }) {
     setFormData(prev => ({
       ...prev,
       [name]: value,
+      // Reset resident_id jika status berubah jadi empty
+      ...(name === 'status' && value === 'empty' ? { resident_id: '' } : {})
     }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!formData.nomor_rumah || !formData.alamat) {
-      setError('Nomor rumah dan alamat harus diisi');
+    if (!formData.house_number) {
+      setError('Nomor rumah harus diisi');
+      return;
+    }
+
+    if (formData.status === 'occupied' && !formData.resident_id) {
+      setError('Nama Penghuni harus dipilih jika rumah dihuni');
       return;
     }
 
@@ -81,7 +87,12 @@ export default function HouseForm({ onSave, error: propError, houses = [] }) {
   };
 
   if (loading) {
-    return <div className="loading">⏳ Memuat data...</div>;
+    return (
+      <div className="card" style={{ textAlign: 'center', padding: '2rem' }}>
+        <div className="loading-spinner"></div>
+        <p>⏳ Memuat data...</p>
+      </div>
+    );
   }
 
   return (
@@ -90,20 +101,23 @@ export default function HouseForm({ onSave, error: propError, houses = [] }) {
         <h2>{id ? '✏️ Edit Rumah' : '➕ Tambah Rumah'}</h2>
       </div>
 
-      {error && <div className="error">⚠️ {error}</div>}
+      {error && <div className="error" style={{ margin: '1rem' }}>⚠️ {error}</div>}
 
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} style={{ padding: '0 1rem 1rem' }}>
         <div className="form-row">
           <div className="form-group">
             <label>Nomor Rumah *</label>
             <input
               type="text"
-              name="nomor_rumah"
-              value={formData.nomor_rumah}
+              name="house_number"
+              value={formData.house_number}
               onChange={handleChange}
-              placeholder="Contoh: 01, 02, A1"
+              placeholder="Contoh: A1, B2, 05"
               required
             />
+            <small style={{ color: '#666', marginTop: '0.25rem', display: 'block' }}>
+              Nomor unik untuk setiap rumah.
+            </small>
           </div>
 
           <div className="form-group">
@@ -114,41 +128,32 @@ export default function HouseForm({ onSave, error: propError, houses = [] }) {
               onChange={handleChange}
               required
             >
-              <option value="kosong">Kosong</option>
-              <option value="dihuni">Dihuni</option>
+              <option value="empty">Kosong</option>
+              <option value="occupied">Dihuni</option>
             </select>
           </div>
         </div>
 
-        <div className="form-group">
-          <label>Alamat *</label>
-          <input
-            type="text"
-            name="alamat"
-            value={formData.alamat}
-            onChange={handleChange}
-            placeholder="Contoh: Jl. Merdeka No. 1"
-            required
-          />
-        </div>
+        {formData.status === 'occupied' && (
+          <div className="form-group">
+            <label>Nama Penghuni *</label>
+            <select
+              name="resident_id"
+              value={formData.resident_id}
+              onChange={handleChange}
+              required
+            >
+              <option value="">-- Pilih Penghuni --</option>
+              {residents.map(resident => (
+                <option key={resident.id} value={resident.id}>
+                  {resident.full_name} ({resident.status === 'permanent' ? 'Tetap' : 'Kontrak'})
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
 
-        <div className="form-group">
-          <label>Penghuni (Opsional)</label>
-          <select
-            name="resident_id"
-            value={formData.resident_id}
-            onChange={handleChange}
-          >
-            <option value="">-- Pilih Penghuni --</option>
-            {residents.map(resident => (
-              <option key={resident.id} value={resident.id}>
-                {resident.nama_lengkap}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end', marginTop: '2rem' }}>
           <button
             type="button"
             className="btn btn-secondary"

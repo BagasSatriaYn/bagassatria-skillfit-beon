@@ -19,7 +19,7 @@ export default function Houses() {
     try {
       setLoading(true);
       const res = await housesAPI.getAll();
-      setHouses(res.data.data || []);
+      setHouses(res.data.data || res.data || []);
       setError(null);
     } catch (err) {
       setError('Gagal memuat data rumah: ' + (err.response?.data?.message || err.message));

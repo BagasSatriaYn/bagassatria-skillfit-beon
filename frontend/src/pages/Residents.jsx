@@ -51,15 +51,7 @@ export default function Residents() {
       setLoading(true); // Tampilkan loading saat proses simpan
       
       if (id) {
-        // TRICK UNTUK BACKEND: 
-        // Jika menggunakan multipart/form-data untuk UPDATE, 
-        // gunakan POST dengan tambahan field _method='PUT' agar file terbaca.
-        if (formData instanceof FormData) {
-          formData.append('_method', 'PUT');
-          await residentsAPI.update(id, formData); 
-        } else {
-          await residentsAPI.update(id, formData);
-        }
+        await residentsAPI.update(id, formData);
       } else {
         await residentsAPI.create(formData);
       }

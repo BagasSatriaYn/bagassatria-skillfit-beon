@@ -100,11 +100,7 @@ export default function ResidentForm({ onSave, error: propError, residents = [] 
   }
 
   // 4. CRITICAL: Method Spoofing untuk Update
-  // Laravel tidak bisa membaca FormData melalui method PUT secara langsung.
-  // Kita harus menggunakan method POST tapi memberitahu Laravel ini adalah PUT.
-  if (id) {
-    submissionData.append('_method', 'PUT');
-  }
+  // Ditangani otomatis oleh interceptor/helper api.js
 
   try {
     // Kirim submissionData langsung
