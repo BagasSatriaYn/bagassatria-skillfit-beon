@@ -19,9 +19,14 @@ export default function PaymentsList({ payments, loading, error, onDelete }) {
     );
   }
 
-  const totalRevenue = payments.reduce((sum, p) => sum + (p.amount || 0), 0);
+  const totalRevenue = payments.reduce((sum, p) => {
+    const paid = p.payments?.reduce((s, pay) => s + pay.amount_paid, 0) || 0;
+    return sum + paid;
+  }, 0);
+  
   const lunas = payments.filter(p => p.status === 'paid').length;
-  const belumLunas = payments.filter(p => p.status !== 'paid').length;
+  const cicilan = payments.filter(p => p.status === 'partial').length;
+  const belumLunas = payments.filter(p => p.status === 'unpaid').length;
 
   return (
     <div className="card">
@@ -45,12 +50,12 @@ export default function PaymentsList({ payments, loading, error, onDelete }) {
 
       {error && <div className="error" style={{ margin: '1rem' }}>⚠️ {error}</div>}
 
-      <div className="grid-3" style={{ marginBottom: '2rem' }}>
+      <div className="grid-4" style={{ marginBottom: '2rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
         <div className="stat-card">
           <div className="stat-card-content">
-            <h3>Total Pembayaran</h3>
+            <h3>Total Masuk</h3>
             <p className="value">Rp {totalRevenue.toLocaleString('id-ID')}</p>
-            <p className="sub-text">Total seluruh transaksi</p>
+            <p className="sub-text">Dana terkumpul</p>
           </div>
           <div className="stat-card-icon icon-bg-primary">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="5" width="20" height="14" rx="2" ry="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
@@ -60,7 +65,7 @@ export default function PaymentsList({ payments, loading, error, onDelete }) {
           <div className="stat-card-content">
             <h3>Lunas</h3>
             <p className="value" style={{ color: 'var(--color-accent-success)' }}>{lunas}</p>
-            <p className="sub-text">Transaksi berhasil</p>
+            <p className="sub-text">Tagihan selesai</p>
           </div>
           <div className="stat-card-icon icon-bg-success">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
@@ -68,9 +73,22 @@ export default function PaymentsList({ payments, loading, error, onDelete }) {
         </div>
         <div className="stat-card">
           <div className="stat-card-content">
-            <h3>Belum Lunas</h3>
+            <h3>Cicilan</h3>
+            <p className="value" style={{ color: '#3B82F6' }}>{cicilan}</p>
+            <p className="sub-text">Proses bayar</p>
+          </div>
+          <div className="stat-card-icon" style={{ backgroundColor: '#DBEAFE', color: '#1E40AF', padding: '10px', borderRadius: '12px' }}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><polyline points="17 11 19 13 23 9"></polyline></svg>
+          </div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-card-content">
+            <h3>Belum Bayar</h3>
             <p className="value" style={{ color: 'var(--color-accent-warning)' }}>{belumLunas}</p>
-            <p className="sub-text">Transaksi tertunda</p>
+            <p className="sub-text">Sama sekali belum</p>
+          </div>
+          <div className="stat-card-icon icon-bg-warning">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
           </div>
         </div>
       </div>
@@ -130,11 +148,20 @@ export default function PaymentsList({ payments, loading, error, onDelete }) {
                   <td>{payment.due_month?.substring(0, 7)}</td>
                   <td>Rp {payment.amount?.toLocaleString('id-ID')}</td>
                   <td>
-                    <span className={`badge ${
-                      payment.status === 'paid' ? 'badge-success' : 'badge-warning'
-                    }`}>
-                      {payment.status === 'paid' ? 'Lunas' : 'Belum Lunas'}
-                    </span>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                      <span className={`badge ${
+                        payment.status === 'paid' ? 'badge-success' : 
+                        payment.status === 'partial' ? 'badge-info' : 'badge-warning'
+                      }`} style={payment.status === 'partial' ? { backgroundColor: '#3B82F6', color: 'white' } : {}}>
+                        {payment.status === 'paid' ? 'Lunas' : 
+                         payment.status === 'partial' ? 'Cicilan' : 'Belum Lunas'}
+                      </span>
+                      {payment.status !== 'paid' && (
+                        <small style={{ color: '#64748B', fontSize: '0.75rem' }}>
+                          Kurang: Rp {(payment.amount - (payment.payments?.reduce((sum, p) => sum + p.amount_paid, 0) || 0)).toLocaleString('id-ID')}
+                        </small>
+                      )}
+                    </div>
                   </td>
                   <td>
                     {payment.payments && payment.payments.length > 0 

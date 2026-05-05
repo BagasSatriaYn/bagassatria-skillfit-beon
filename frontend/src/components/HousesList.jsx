@@ -238,8 +238,12 @@ export default function HousesList({ houses, loading, error, onDelete }) {
                               <td style={{ padding: '12px 8px' }}><strong>{due.resident?.full_name || 'Tidak Diketahui'}</strong></td>
                               <td style={{ padding: '12px 8px' }}>{due.due_type === 'security' ? 'Satpam' : 'Kebersihan'}</td>
                               <td style={{ padding: '12px 8px' }}>
-                                <span className={`badge ${due.status === 'paid' ? 'badge-success' : 'badge-warning'}`}>
-                                  {due.status === 'paid' ? 'Lunas' : 'Belum Lunas'}
+                                <span className={`badge ${
+                                  due.status === 'paid' ? 'badge-success' : 
+                                  due.status === 'partial' ? 'badge-info' : 'badge-warning'
+                                }`} style={due.status === 'partial' ? { backgroundColor: '#3B82F6', color: 'white' } : {}}>
+                                  {due.status === 'paid' ? 'Lunas' : 
+                                   due.status === 'partial' ? 'Cicilan' : 'Belum Lunas'}
                                 </span>
                               </td>
                             </tr>

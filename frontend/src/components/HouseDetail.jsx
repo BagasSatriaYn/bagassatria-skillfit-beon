@@ -141,9 +141,11 @@ export default function HouseDetail({ houses, onRefresh }) {
                   <td>Rp {payment.jumlah?.toLocaleString('id-ID')}</td>
                   <td>
                     <span className={`badge ${
-                      payment.status === 'lunas' ? 'badge-success' : 'badge-warning'
-                    }`}>
-                      {payment.status}
+                      payment.status === 'lunas' || payment.status === 'paid' ? 'badge-success' : 
+                      payment.status === 'partial' ? 'badge-info' : 'badge-warning'
+                    }`} style={payment.status === 'partial' ? { backgroundColor: '#3B82F6', color: 'white' } : {}}>
+                      {payment.status === 'lunas' || payment.status === 'paid' ? 'Lunas' : 
+                       payment.status === 'partial' ? 'Cicilan' : 'Belum Lunas'}
                     </span>
                   </td>
                 </tr>

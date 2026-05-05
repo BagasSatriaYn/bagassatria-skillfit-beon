@@ -20,7 +20,7 @@ export default function PaymentForm({ onSave, error: propError, payments = [] })
     start_month: new Date().toISOString().slice(0, 7),
     kebersihan_months: 1,
     satpam_months: 1,
-    status: 'lunas',
+    amount_paid: 115000,
     tanggal_bayar: new Date().toISOString().slice(0, 10),
   });
 
@@ -30,7 +30,7 @@ export default function PaymentForm({ onSave, error: propError, payments = [] })
     jenis_iuran: 'satpam',
     bulan: '',
     jumlah: 0,
-    status: 'belum',
+    amount_paid: 0,
     tanggal_bayar: '',
   });
 
@@ -61,13 +61,16 @@ export default function PaymentForm({ onSave, error: propError, payments = [] })
         const res = await paymentsAPI.get(id);
         p = res.data.data;
       }
+      
+      const currentPaid = p.payments?.reduce((sum, pay) => sum + pay.amount_paid, 0) || 0;
+
       setEditData({
         resident_id: p.resident_id,
         jenis_iuran: p.due_type === 'security' ? 'satpam' : 'kebersihan',
         bulan: p.due_month?.substring(0, 7) || new Date().toISOString().slice(0, 7),
         jumlah: p.amount,
-        status: p.status === 'paid' ? 'lunas' : 'belum',
-        tanggal_bayar: p.payments?.length > 0 ? p.payments[0].payment_date.substring(0, 10) : '',
+        amount_paid: currentPaid,
+        tanggal_bayar: p.payments?.length > 0 ? p.payments[0].payment_date.substring(0, 10) : new Date().toISOString().slice(0, 10),
       });
       setLoading(false);
     } catch (err) {
@@ -78,7 +81,15 @@ export default function PaymentForm({ onSave, error: propError, payments = [] })
 
   const handleBulkChange = (e) => {
     const { name, value } = e.target;
-    setBulkData({ ...bulkData, [name]: value });
+    let newData = { ...bulkData, [name]: value };
+    
+    // Auto calculate amount_paid if months change
+    if (name === 'kebersihan_months' || name === 'satpam_months') {
+      const newTotal = (Number(newData.kebersihan_months || 0) * CHARGES.kebersihan) + (Number(newData.satpam_months || 0) * CHARGES.satpam);
+      newData.amount_paid = newTotal;
+    }
+    
+    setBulkData(newData);
   };
 
   const handleEditChange = (e) => {
@@ -86,6 +97,7 @@ export default function PaymentForm({ onSave, error: propError, payments = [] })
     let newData = { ...editData, [name]: value };
     if (name === 'jenis_iuran') {
       newData.jumlah = CHARGES[value] || 0;
+      newData.amount_paid = newData.jumlah;
     }
     setEditData(newData);
   };
@@ -169,16 +181,28 @@ export default function PaymentForm({ onSave, error: propError, payments = [] })
 
             <div className="form-row">
               <div className="form-group">
-                <label>Status *</label>
-                <select name="status" value={bulkData.status} onChange={handleBulkChange} required>
-                  <option value="belum">Belum Lunas</option>
-                  <option value="lunas">Lunas</option>
-                </select>
+                <label>Nominal Dibayar (Rp) *</label>
+                <input 
+                  type="number" 
+                  name="amount_paid" 
+                  value={bulkData.amount_paid} 
+                  onChange={handleBulkChange} 
+                  required 
+                  min="0"
+                  style={{ fontWeight: 'bold', color: 'var(--color-accent-success)', fontSize: '1.1rem' }}
+                />
+                <small style={{ color: '#64748B' }}>Bisa diisi cicilan atau lunas sesuai total tagihan.</small>
               </div>
 
               <div className="form-group">
-                <label>Tanggal Bayar (jika Lunas)</label>
-                <input type="date" name="tanggal_bayar" value={bulkData.tanggal_bayar} onChange={handleBulkChange} disabled={bulkData.status !== 'lunas'} />
+                <label>Tanggal Bayar *</label>
+                <input 
+                  type="date" 
+                  name="tanggal_bayar" 
+                  value={bulkData.tanggal_bayar} 
+                  onChange={handleBulkChange} 
+                  required
+                />
               </div>
             </div>
 
@@ -224,16 +248,27 @@ export default function PaymentForm({ onSave, error: propError, payments = [] })
 
             <div className="form-row">
               <div className="form-group">
-                <label>Status *</label>
-                <select name="status" value={editData.status} onChange={handleEditChange} required>
-                  <option value="belum">Belum Lunas</option>
-                  <option value="lunas">Lunas</option>
-                </select>
+                <label>Nominal Dibayar (Rp) *</label>
+                <input 
+                  type="number" 
+                  name="amount_paid" 
+                  value={editData.amount_paid} 
+                  onChange={handleEditChange} 
+                  required 
+                  min="0"
+                  style={{ fontWeight: 'bold', color: 'var(--color-accent-success)', fontSize: '1.1rem' }}
+                />
               </div>
 
               <div className="form-group">
-                <label>Tanggal Bayar (jika Lunas)</label>
-                <input type="date" name="tanggal_bayar" value={editData.tanggal_bayar} onChange={handleEditChange} disabled={editData.status !== 'lunas'} />
+                <label>Tanggal Bayar *</label>
+                <input 
+                  type="date" 
+                  name="tanggal_bayar" 
+                  value={editData.tanggal_bayar} 
+                  onChange={handleEditChange} 
+                  required
+                />
               </div>
             </div>
           </>

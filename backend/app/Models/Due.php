@@ -29,4 +29,19 @@ class Due extends Model
     {
         return $this->hasMany(Payment::class);
     }
+
+    public function updateStatus()
+    {
+        $totalPaid = $this->payments()->sum('amount_paid');
+
+        if ($totalPaid >= $this->amount) {
+            $this->status = 'paid';
+        } elseif ($totalPaid > 0) {
+            $this->status = 'partial';
+        } else {
+            $this->status = 'unpaid';
+        }
+
+        $this->save();
+    }
 }

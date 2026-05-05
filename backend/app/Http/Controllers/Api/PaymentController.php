@@ -24,17 +24,8 @@ class PaymentController extends Controller
             'amount_paid' => $data['amount_paid']
         ]);
 
-        // total pembayaran
-        $totalPaid = $due->payments()->sum('amount_paid');
-
-        // update status
-        if ($totalPaid >= $due->amount) {
-            $due->status = 'paid';
-        } elseif ($totalPaid > 0) {
-            $due->status = 'partial';
-        }
-
-        $due->save();
+        // update status otomatis
+        $due->updateStatus();
 
         return response()->json([
             'message' => 'Payment success',

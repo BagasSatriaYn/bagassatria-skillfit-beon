@@ -245,9 +245,11 @@ export default function PaymentReport({ payments, loading, error }) {
                     <td>Rp {payment.amount?.toLocaleString('id-ID')}</td>
                     <td>
                       <span className={`badge ${
-                        payment.status === 'paid' ? 'badge-success' : 'badge-warning'
-                      }`}>
-                        {payment.status === 'paid' ? 'Lunas' : 'Belum Lunas'}
+                        payment.status === 'paid' ? 'badge-success' : 
+                        payment.status === 'partial' ? 'badge-info' : 'badge-warning'
+                      }`} style={payment.status === 'partial' ? { backgroundColor: '#3B82F6', color: 'white' } : {}}>
+                        {payment.status === 'paid' ? 'Lunas' : 
+                         payment.status === 'partial' ? 'Cicilan' : 'Belum Lunas'}
                       </span>
                     </td>
                     <td>
