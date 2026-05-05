@@ -1,43 +1,53 @@
-import { Link, useLocation, Outlet } from 'react-router-dom';
-import Sidebar from './Sidebar'; // Pastikan file ini ada
-import Navbar from './Navbar';   // Pastikan file ini ada
+import { useState, useEffect } from 'react';
+import { Outlet, useLocation } from 'react-router-dom';
+import Sidebar from './Sidebar';
+import Navbar from './Navbar';
+import '../../App.css';
 
 export default function MainLayout() {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 768);
   const location = useLocation();
 
-  const navItems = [
-    { label: 'Dashboard', path: '/', icon: '📊' },
-    { label: 'Penghuni', path: '/residents', icon: '👥' },
-    { label: 'Rumah', path: '/houses', icon: '🏠' },
-    { label: 'Pembayaran', path: '/payments', icon: '💳' },
-    { label: 'Laporan', path: '/reports', icon: '📑' },
-  ];
+  // Close sidebar on mobile when route changes
+  useEffect(() => {
+    if (window.innerWidth <= 768) {
+      setIsSidebarOpen(false);
+    }
+  }, [location]);
+
+  // Handle window resize
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 768 && !isSidebarOpen) {
+        setIsSidebarOpen(true);
+      } else if (window.innerWidth <= 768 && isSidebarOpen) {
+        setIsSidebarOpen(false);
+      }
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [isSidebarOpen]);
+
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
 
   return (
-    <div className="app-container">
-      {/* Kamu bisa memanggil Sidebar/Navbar di sini atau menggabungkan logikanya */}
-      <nav className="navbar">
-        <div className="nav-brand">
-          <h1>🏠 Smart RT</h1>
-        </div>
-        <ul className="nav-links">
-          {navItems.map(item => (
-            <li key={item.path}>
-              <Link 
-                to={item.path}
-                className={location.pathname === item.path ? 'active' : ''}
-              >
-                {item.icon} {item.label}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </nav>
-
-      <main className="main-content">
-        {/* Outlet adalah tempat di mana halaman (Dashboard, Residents, dll) akan muncul */}
-        <Outlet />
-      </main>
+    <div className={`admin-layout ${isSidebarOpen ? 'sidebar-open' : 'sidebar-closed'}`}>
+      <Sidebar />
+      
+      {/* Overlay untuk mobile saat sidebar terbuka */}
+      {isSidebarOpen && window.innerWidth <= 768 && (
+        <div className="sidebar-overlay" onClick={toggleSidebar}></div>
+      )}
+      
+      <div className="admin-main">
+        <Navbar toggleSidebar={toggleSidebar} />
+        <main className="admin-content">
+          <Outlet />
+        </main>
+      </div>
     </div>
   );
-}
+}
