@@ -38,6 +38,12 @@
 - 🎯 **Branding Modern**  
   UI/UX bersih dengan tema warna **Emerald & Orange** yang profesional.
 
+  🖼️ **Manajemen Data Warga**
+
+  Pencatatan identitas warga yang terintegrasi dengan fitur upload dokumen pendukung.
+
+  💡 Note: Untuk pengujian fitur Upload KTP, silakan unggah gambar mandiri dari perangkat Anda karena data awal pada seeder hanya menggunakan placeholder.
+
 ---
 
 ## ⚙️ Panduan Instalasi (WAJIB DIIKUTI)
@@ -91,6 +97,8 @@ Gunakan akun berikut untuk login:
 
 Email    : admin@rt.com <br>
 Password : password
+
+⚠️ Penting: Jika Anda mencoba menambah atau mengubah data warga, silakan unggah file gambar (JPG/PNG) sendiri pada kolom KTP untuk memvalidasi fungsi penyimpanan file di server lokal.
 
 
 ### 🧪 Pengujian Sistem
