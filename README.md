@@ -44,6 +44,23 @@
 
   💡 Note: Untuk pengujian fitur Upload KTP, silakan unggah gambar mandiri dari perangkat Anda karena data awal pada seeder hanya menggunakan placeholder.
 
+  ## 📊 Database Design (ERD)
+
+Sistem ini dirancang dengan struktur database yang mendukung pelacakan historis hunian dan fleksibilitas pembayaran iuran.
+
+
+### Penjelasan Struktur:
+
+- **Manajemen Hunian (Historis):** 
+  Melalui tabel `house_histories`, sistem dapat melacak riwayat penghuni rumah. Rumah dianggap dihuni secara aktif jika terdapat data dengan `end_date` bernilai `NULL`.
+  
+- **Sistem Iuran & Pembayaran:**
+  - **Tabel `dues`**: Menyimpan tagihan iuran per rumah per bulan (misal: Keamanan/Kebersihan). Tagihan bersifat unik untuk kombinasi `house_id`, `due_type`, dan `due_month`.
+  - **Tabel `payments`**: Memungkinkan satu tagihan (`dues`) dibayar melalui beberapa kali transaksi. Hal ini mendukung status pembayaran **Partial** (cicilan).
+
+- **Pelacakan Pengeluaran:**
+  Tabel `expenses` mencatat seluruh arus kas keluar RT secara mendetail untuk transparansi laporan keuangan.
+
 ---
 
 ## ⚙️ Panduan Instalasi (WAJIB DIIKUTI)
