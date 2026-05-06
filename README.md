@@ -44,7 +44,7 @@
 
   💡 Note: Untuk pengujian fitur Upload KTP, silakan unggah gambar mandiri dari perangkat Anda karena data awal pada seeder hanya menggunakan placeholder.
 
-  ## 📊 Database Design (ERD)
+## 📊 Database Design (ERD)
 
 Sistem ini dirancang dengan struktur database yang mendukung pelacakan historis hunian dan fleksibilitas pembayaran iuran.
 
