@@ -49,6 +49,9 @@
 Sistem ini dirancang dengan struktur database yang mendukung pelacakan historis hunian dan fleksibilitas pembayaran iuran.
 
 
+![Entity Relationship Diagram](./docs/image-erd.png)
+
+
 ### Penjelasan Struktur:
 
 - **Manajemen Hunian (Historis):** 
